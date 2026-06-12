@@ -1,0 +1,17 @@
+name: reentry
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - numpy
+  - scipy
+  - pandas
+  - pyarrow        # for parquet read/write
+  - matplotlib
+  - tqdm
+  - jupyterlab
+  - pip
+  - pip:
+    - torch          # PyTorch via pip — conda-forge version is slower on M1
+    - torchvision
