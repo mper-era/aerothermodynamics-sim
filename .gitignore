@@ -1,0 +1,20 @@
+# Data — too large for git
+data/
+
+# Model checkpoints
+model/checkpoint.pt
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# MATLAB
+*.asv
+*.m~
+
+# macOS
+.DS_Store
+
+# Conda env
+*.egg-info/
