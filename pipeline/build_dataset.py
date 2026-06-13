@@ -9,7 +9,7 @@ OUT_PATH = REPO_ROOT / 'data' / 'processed.parquet'
 MODELS = ['sc', 'krd', 'fr', 'vd']
 MODEL_COLS = [f'{q}_{m}' for q in ('CL', 'CD', 'q') for m in MODELS]
 
-# FOSTRAD regime thresholds (STRATH_A_mb.m)
+# FOSTRAD regime threshold (STRATH_A_mb.m)
 LIM_KN_CONT = 1e-4
 LIM_KN_FMF = 100
 
