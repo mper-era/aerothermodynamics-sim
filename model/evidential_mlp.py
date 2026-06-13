@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class EvidentialMLP(nn.Module):
-    def __init__(self, in_dim=3, hidden=64, out_dim=3):
+    def __init__(self, in_dim=4, hidden=64, out_dim=3):
         super().__init__()
         self.backbone = nn.Sequential(
             nn.Linear(in_dim, hidden), nn.SiLU(),

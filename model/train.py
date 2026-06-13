@@ -4,13 +4,18 @@ sys.path.insert(0, '.')
 import torch
 import pandas as pd
 import numpy as np
+from pathlib import Path
 from torch.utils.data import DataLoader, TensorDataset, random_split
 from evidential_mlp import EvidentialMLP, evidential_loss
 
-df = pd.read_parquet('../data/processed.parquet').dropna()
+DATA_PATH = Path(__file__).resolve().parent.parent / 'data' / 'processed.parquet'
+FEATURE_COLS = ['altitude_km', 'velocity_ms', 'alpha_deg', 'Twall_K']
+TARGET_COLS = ['CL_mean', 'CD_mean', 'q_mean']
 
-X_raw = df[['altitude_km', 'velocity_ms', 'alpha_deg']].values.astype(np.float32)
-Y_raw = df[['CL_mean', 'CD_mean', 'q_mean']].values.astype(np.float32)
+df = pd.read_parquet(DATA_PATH).dropna(subset=FEATURE_COLS + TARGET_COLS)
+
+X_raw = df[FEATURE_COLS].values.astype(np.float32)
+Y_raw = df[TARGET_COLS].values.astype(np.float32)
 
 X_mean, X_std = X_raw.mean(0), X_raw.std(0)
 Y_mean, Y_std = Y_raw.mean(0), Y_raw.std(0)
@@ -18,20 +23,25 @@ Y_mean, Y_std = Y_raw.mean(0), Y_raw.std(0)
 X = torch.tensor((X_raw - X_mean) / X_std)
 Y = torch.tensor((Y_raw - Y_mean) / Y_std)
 
-n_val    = max(1, int(0.15 * len(X)))
-train_ds, val_ds = random_split(TensorDataset(X, Y), [len(X) - n_val, n_val])
+n_val = max(1, int(0.15 * len(X)))
+generator = torch.Generator().manual_seed(42)
+train_ds, val_ds = random_split(
+    TensorDataset(X, Y), [len(X) - n_val, n_val], generator=generator
+)
 train_dl = DataLoader(train_ds, batch_size=32, shuffle=True)
-val_dl   = DataLoader(val_ds,   batch_size=64)
+val_dl = DataLoader(val_ds, batch_size=64)
 
-model = EvidentialMLP()
-opt   = torch.optim.Adam(model.parameters(), lr=3e-4)
+model = EvidentialMLP(in_dim=len(FEATURE_COLS))
+opt = torch.optim.Adam(model.parameters(), lr=3e-4)
 
 for epoch in range(300):
     model.train()
     for xb, yb in train_dl:
         mu, v, alpha, beta = model(xb)
         loss = evidential_loss(mu, v, alpha, beta, yb)
-        opt.zero_grad(); loss.backward(); opt.step()
+        opt.zero_grad()
+        loss.backward()
+        opt.step()
 
     if (epoch + 1) % 50 == 0:
         model.eval()
@@ -44,7 +54,10 @@ for epoch in range(300):
 
 torch.save({
     'model': model.state_dict(),
-    'X_mean': X_mean, 'X_std': X_std,
-    'Y_mean': Y_mean, 'Y_std': Y_std,
+    'feature_cols': FEATURE_COLS,
+    'X_mean': X_mean,
+    'X_std': X_std,
+    'Y_mean': Y_mean,
+    'Y_std': Y_std,
 }, 'checkpoint.pt')
 print("Saved checkpoint.pt")
