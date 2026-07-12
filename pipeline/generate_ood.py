@@ -14,9 +14,7 @@ bounds = {
 
 N = 30
 sampler = qmc.LatinHypercube(d=4, seed=99)
-samples = qmc.scale(sampler.random(N),
-                    [v[0] for v in bounds.values()],
-                    [v[1] for v in bounds.values()])
+samples = qmc.scale(sampler.random(N), [v[0] for v in bounds.values()], [v[1] for v in bounds.values()])
 
 df = pd.DataFrame(samples, columns=bounds.keys())
 df.to_csv('data/ood_samples.csv', index=False)

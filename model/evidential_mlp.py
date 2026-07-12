@@ -19,7 +19,6 @@ def evidential_loss(mu, v, alpha, beta, y, is_ood=None, lam=0.2, ood_weight=5.0)
 
     return loss.mean()
 
-
 class EvidentialMLP(nn.Module):
     def __init__(self, in_dim=4, hidden=64, out_dim=3):
         super().__init__()
@@ -28,15 +27,15 @@ class EvidentialMLP(nn.Module):
             nn.Linear(hidden, hidden), nn.ReLU(),
             nn.Linear(hidden, hidden), nn.ReLU(),
         )
-        self.mu_head    = nn.Linear(hidden, out_dim)
-        self.v_head     = nn.Linear(hidden, out_dim)
+        self.mu_head = nn.Linear(hidden, out_dim)
+        self.v_head = nn.Linear(hidden, out_dim)
         self.alpha_head = nn.Linear(hidden, out_dim)
-        self.beta_head  = nn.Linear(hidden, out_dim)
+        self.beta_head = nn.Linear(hidden, out_dim)
 
     def forward(self, x):
-        h     = self.net(x)
-        mu    = self.mu_head(h)
-        v     = nn.functional.softplus(self.v_head(h)) + 1e-4
+        h = self.net(x)
+        mu = self.mu_head(h)
+        v = nn.functional.softplus(self.v_head(h)) + 1e-4
         alpha = nn.functional.softplus(self.alpha_head(h)) + 1 + 1e-4
-        beta  = nn.functional.softplus(self.beta_head(h)) + 1e-4
+        beta = nn.functional.softplus(self.beta_head(h)) + 1e-4
         return mu, v, alpha, beta

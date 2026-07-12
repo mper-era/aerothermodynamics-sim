@@ -6,10 +6,10 @@ from torch.utils.data import TensorDataset, DataLoader
 from evidential_mlp import EvidentialMLP, evidential_loss
 
 FEATURE_COLS = ['altitude_km', 'velocity_ms', 'alpha_deg', 'Twall_K']
-TARGET_COLS  = ['CL_mean', 'CD_mean', 'q_mean']
-EPOCHS       = 300
-BATCH        = 32
-LR           = 3e-4
+TARGET_COLS = ['CL_mean', 'CD_mean', 'q_mean']
+EPOCHS = 300
+BATCH = 32
+LR = 3e-4
 
 # Load data
 df = pd.read_parquet('../data/processed.parquet')
@@ -22,28 +22,28 @@ X_norm = (X_raw - X_mean) / X_std
 Y_norm = (Y_raw - Y_mean) / Y_std
 
 # Train/val split
-idx     = np.random.permutation(len(X_norm))
-n_val   = int(0.15 * len(idx))
+idx = np.random.permutation(len(X_norm))
+n_val = int(0.15 * len(idx))
 val_idx, train_idx = idx[:n_val], idx[n_val:]
 X_train, Y_train = X_norm[train_idx], Y_norm[train_idx]
-X_val,   Y_val   = X_norm[val_idx],   Y_norm[val_idx]
+X_val, Y_val   = X_norm[val_idx],   Y_norm[val_idx]
 
 # Augment training set with OOD points
 import os
 OOD_PATH = '../data/ood_processed.parquet'
 if os.path.exists(OOD_PATH):
-    ood_df    = pd.read_parquet(OOD_PATH)
+    ood_df = pd.read_parquet(OOD_PATH)
     X_ood_raw = ood_df[FEATURE_COLS].values.astype(np.float32)
     Y_ood_raw = ood_df[TARGET_COLS].values.astype(np.float32)
     X_ood_norm = (X_ood_raw - X_mean) / X_std
     Y_ood_norm = (Y_ood_raw - Y_mean) / Y_std
-    X_train    = np.concatenate([X_train, X_ood_norm])
-    Y_train    = np.concatenate([Y_train, Y_ood_norm])
-    is_ood     = np.array([False]*len(train_idx) + [True]*len(X_ood_norm))
-    print(f'Augmented with {len(X_ood_norm)} OOD points')
+    X_train = np.concatenate([X_train, X_ood_norm])
+    Y_train = np.concatenate([Y_train, Y_ood_norm])
+    is_ood = np.array([False]*len(train_idx) + [True]*len(X_ood_norm))
+    print(f"Augmented with {len(X_ood_norm)} OOD points")
 else:
     is_ood = np.array([False]*len(X_train))
-    print('No OOD data found, training without augmentation')
+    print("No OOD data found, training without augmentation")
 
 # Datasets
 train_ds = TensorDataset(
@@ -82,15 +82,15 @@ for epoch in range(EPOCHS):
             val_losses.append(evidential_loss(mu, v, alpha, beta, Y_b).item())
     val_loss = np.mean(val_losses)
     if val_loss < best_val:
-        best_val   = val_loss
+        best_val = val_loss
         best_state = {k: v.clone() for k, v in model.state_dict().items()}
 
     if epoch % 50 == 0:
         print(f'Epoch {epoch:3d} | val loss {val_loss:.4f}')
 
 torch.save({
-    'model':  best_state,
+    'model': best_state,
     'X_mean': X_mean, 'X_std': X_std,
     'Y_mean': Y_mean, 'Y_std': Y_std,
 }, '../model/checkpoint.pt')
-print(f'Done. Best val loss: {best_val:.4f}')
+print(f"Done. Best val loss: {best_val:.4f}")

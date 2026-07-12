@@ -17,10 +17,7 @@ MODEL_COLS = [f'{q}_{m}' for q in ('CL', 'CD', 'q') for m in MODELS]
 df = pd.read_csv(LHS_PATH)
 missing = [c for c in REQUIRED_COLS if c not in df.columns]
 if missing:
-    raise SystemExit(
-        f"Missing columns in {LHS_PATH}: {missing}\n"
-        "Run: python pipeline/generate_lhs.py"
-    )
+    raise SystemExit(f"Missing columns in {LHS_PATH}: {missing}\n" "Run: python pipeline/generate_lhs.py")
 
 print("Starting MATLAB engine (15-20s)...")
 eng = matlab.engine.start_matlab()
@@ -67,8 +64,8 @@ out = pd.DataFrame(results)
 out.to_csv(OUT_PATH, index=False)
 
 n_nan_rows = out[MODEL_COLS].isna().any(axis=1).sum()
-print(f"\nDone. Results in {OUT_PATH}")
-print(f"  Rows: {len(out)}")
-print(f"  Model call failures: {failures}")
+print(f"\nProcess Finished. Results in {OUT_PATH}")
+print(f"Rows: {len(out)}")
+print(f"Model call failures: {failures}")
 if n_nan_rows:
-    print(f"  WARNING: {n_nan_rows} rows have incomplete model outputs")
+    print(f"WARNING: {n_nan_rows} rows have incomplete model outputs")

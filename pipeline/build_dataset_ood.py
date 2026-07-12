@@ -21,5 +21,5 @@ for qty in ['CL', 'CD', 'q']:
     df[f'{qty}_cv']   = df[f'{qty}_std'] / (df[f'{qty}_mean'].abs() + 1e-8)
 
 df.to_parquet('data/ood_processed.parquet', index=False)
-print(f'Saved to data/ood_processed.parquet')
+print(f"Saved to data/ood_processed.parquet")
 print(df['regime'].value_counts())

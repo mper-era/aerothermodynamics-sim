@@ -41,12 +41,12 @@ class SimplifiedRSSM(nn.Module):
         return mu, F.softplus(log_sigma) + 1e-4
 
     def decode(self, z, h):
-        x   = torch.cat([z, h], dim=-1)
+        x = torch.cat([z, h], dim=-1)
         out = self.decoder(x).reshape(*x.shape[:-1], self.out_dim, 4)
-        mu    = out[..., 0]
-        v     = F.softplus(out[..., 1]) + 1e-4
+        mu = out[..., 0]
+        v = F.softplus(out[..., 1]) + 1e-4
         alpha = F.softplus(out[..., 2]) + 1.0
-        beta  = F.softplus(out[..., 3]) + 1e-4
+        beta = F.softplus(out[..., 3]) + 1e-4
         return mu, v, alpha, beta
 
     def forward(self, obs_seq):
@@ -77,11 +77,11 @@ class SimplifiedRSSM(nn.Module):
             all_beta.append(beta)
             all_kl.append(kl)
 
-        return (torch.stack(all_mu,    dim=1),
-                torch.stack(all_v,     dim=1),
+        return (torch.stack(all_mu, dim=1),
+                torch.stack(all_v, dim=1),
                 torch.stack(all_alpha, dim=1),
-                torch.stack(all_beta,  dim=1),
-                torch.stack(all_kl,    dim=0).mean())
+                torch.stack(all_beta, dim=1),
+                torch.stack(all_kl, dim=0).mean())
 
     def rollout(self, obs_seq):
         self.eval()
@@ -101,5 +101,5 @@ class SimplifiedRSSM(nn.Module):
                 ep_stds.append(ep_std.squeeze(0))
                 h = self.gru(o_t, h)
 
-            return (torch.stack(means,   dim=0),
+            return (torch.stack(means, dim=0),
                     torch.stack(ep_stds, dim=0))
