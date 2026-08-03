@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from scipy.integrate import solve_ivp
-from scipy.spatial import KDTree
+from scipy.interpolate import RBFInterpolator
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
@@ -19,14 +19,19 @@ def make_lookup(df):
     pts = df[['altitude_km', 'velocity_ms', 'alpha_deg', 'Twall_K']].values.astype(float)
     std = pts.std(axis=0)
     std[std == 0] = 1.0
-    tree = KDTree(pts / std)
-    return tree, pts, std, df
+    pts_norm = pts / std
 
-def lookup_aero(tree, pts, std, df, h_km, v_ms, alpha, Twall):
-    query = np.array([h_km, v_ms, alpha, Twall]) / std
-    _, idx = tree.query(query)
-    row = df.iloc[idx]
-    return float(row['CD_mean']), float(row['CL_mean']), float(row['q_mean'])
+    targets = df[['CD_mean', 'CL_mean', 'q_mean']].values.astype(float)
+
+    # 'thin_plate_spline', no free shape parameter to tune, may change later for different RBF smoothing
+    rbf = RBFInterpolator(pts_norm, targets, kernel='thin_plate_spline', smoothing=0.0)
+
+    return rbf, pts_norm, std, df
+
+def lookup_aero(rbf, pts_norm, std, df, h_km, v_ms, alpha, Twall):
+    query = (np.array([h_km, v_ms, alpha, Twall]) / std).reshape(1, -1)
+    CD, CL, q = rbf(query)[0]
+    return float(CD), float(CL), float(q)
 
 def reentry_3dof(t, state, tree, pts, std, df, alpha, Twall, m, S_ref):
     r, v, gamma = state

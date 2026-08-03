@@ -20,14 +20,19 @@ n_dropped = n_before - len(df)
 if n_dropped:
     print(f"Warning: dropped {n_dropped} rows with incomplete model outputs")
 
-if 'Kn_fostrad' in df.columns and df['Kn_fostrad'].notna().all():
+if 'Kn_fostrad' in df.columns:
     df['Kn'] = df['Kn_fostrad']
-    df['Kn_source'] = 'fostrad'
+    proxy_mask = df['Kn'].isna()
+    if proxy_mask.any():
+        lambda_m = 2.37e-5 * np.exp(df.loc[proxy_mask, 'altitude_km'] / 8.5)
+        df.loc[proxy_mask, 'Kn'] = lambda_m
+        print(f"Warning: {proxy_mask.sum()} rows used proxy Kn")
+    df['Kn_source'] = np.where(df['Kn_fostrad'].notna(), 'fostrad', 'proxy')
 else:
     df['lambda_m'] = 2.37e-5 * np.exp(df['altitude_km'] / 8.5)
     df['Kn'] = df['lambda_m'] / 1.0
     df['Kn_source'] = 'proxy'
-    print("Warning: Kn_fostrad missing; using exponential-atmosphere proxy for Kn")
+    print("Warning: Kn_fostrad column missing entirely; using exponential-atmosphere proxy for Kn")
 
 df['regime'] = 'transitional'
 df.loc[df['Kn'] <= LIM_KN_CONT, 'regime'] = 'continuum'

@@ -22,6 +22,7 @@ X_norm = (X_raw - X_mean) / X_std
 Y_norm = (Y_raw - Y_mean) / Y_std
 
 # Train/val split
+np.random.seed(42)
 idx = np.random.permutation(len(X_norm))
 n_val = int(0.15 * len(idx))
 val_idx, train_idx = idx[:n_val], idx[n_val:]
