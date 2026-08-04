@@ -18,12 +18,14 @@ This project trains two complementary neural surrogates on FOSTRAD simulation da
 | OOD epistemic ratio (evidential head) | 0.52× (failure mode confirmed) |
 | OOD distance ratio (k-NN) | 2.90× (clean separation) |
 | Peak uncertainty altitude (RSSM) | 35–50 km (peak heating corridor) |
+
 *replace with table of result-wise comparisons between evidential MLP and simplified RSSM*
 
 ## Requirements
 
 - Python 3.11 (conda environment recommended)
 - MATLAB with FOSTRAD (for data generation only; not needed for model training/inference)
+
 *add link to FOSTRAD project and relevant citations*
 
 ## Installation
@@ -35,6 +37,7 @@ conda create -n reentry python=3.11
 conda activate reentry
 pip install torch numpy pandas scipy scikit-learn matplotlib seaborn pyarrow
 ```
+
 *replace package list with a `requirements.txt` file*
 
 
@@ -91,6 +94,7 @@ Run all cells top-to-bottom. Cell 7 (OOD detection) requires `data/ood_processed
 | Cell 6 | LHS parameter space coverage pairplot |
 | Cell 7 | OOD detection: evidential uncertainty + k-NN distance |
 | Cell 8 | RSSM multi-step rollout degradation |
+
 *update notebook structure description when notebook is updated*
 
 ## Model Architecture

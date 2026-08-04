@@ -1,20 +1,28 @@
 # Data
-data/
+data/trajectories.parquet
+sweep_log.txt
 
-# Model checkpoints
-model/checkpoint.pt
+# Model Checkpoints
+model/*.pt
 
 # Python
 __pycache__/
 *.pyc
+*.pyo
 .ipynb_checkpoints/
+*.egg-info/
+.pytest_cache/
+.env
 
 # MATLAB
 *.asv
 *.m~
+slprj/
 
 # macOS
 .DS_Store
+._*
 
-# Conda env
-*.egg-info/
+# Conda or Venv
+.venv/
+venv/
