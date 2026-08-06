@@ -2,11 +2,13 @@ import matlab.engine
 from pathlib import Path
 
 FOSTRAD = str(Path('fostrad').resolve())
+PIPELINE = str(Path('pipeline').resolve())
 STL     = str(Path('fostrad/IXV.00001.stl').resolve())
 
 print("Starting MATLAB engine (15-20s)...")
 eng = matlab.engine.start_matlab()
 eng.addpath(eng.genpath(FOSTRAD), nargout=0)
+eng.addpath(PIPELINE, nargout=0)
 eng.cd(FOSTRAD, nargout=0)
 
 print("Running single FOSTRAD call...")

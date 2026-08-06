@@ -5,6 +5,7 @@ from pathlib import Path
 from tqdm import tqdm
 
 FOSTRAD = str(Path(__file__).parent.parent / 'fostrad')
+PIPELINE = str(Path(__file__).parent.parent / 'pipeline')
 STL = str(Path(FOSTRAD) / 'IXV.00001.stl')
 MODELS = ['sc', 'krd', 'fr', 'vd']
 OUT_PATH = 'data/ood_results.csv'
@@ -15,6 +16,7 @@ assert 'Twall_K' in df.columns
 print("Starting MATLAB engine...")
 eng = matlab.engine.start_matlab()
 eng.addpath(eng.genpath(FOSTRAD), nargout=0)
+eng.addpath(PIPELINE, nargout=0)
 eng.cd(FOSTRAD, nargout=0)
 
 results = []

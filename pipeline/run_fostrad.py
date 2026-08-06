@@ -6,6 +6,7 @@ from tqdm import tqdm
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 FOSTRAD = str(REPO_ROOT / 'fostrad')
+PIPELINE = str(REPO_ROOT / 'pipeline')
 STL = str((REPO_ROOT / 'fostrad' / 'IXV.00001.stl').resolve())
 LHS_PATH = REPO_ROOT / 'data' / 'lhs_samples.csv'
 OUT_PATH = REPO_ROOT / 'data' / 'sweep_results.csv'
@@ -22,6 +23,7 @@ if missing:
 print("Starting MATLAB engine (15-20s)...")
 eng = matlab.engine.start_matlab()
 eng.addpath(eng.genpath(FOSTRAD), nargout=0)
+eng.addpath(PIPELINE, nargout=0)
 eng.cd(FOSTRAD, nargout=0)
 
 results = []
