@@ -12,7 +12,7 @@ bounds = {
     'Twall_K':     (300, 1500),
 }
 
-N = 300 
+N = 300
 sampler = qmc.LatinHypercube(d=4, seed=42)
 samples = qmc.scale(sampler.random(N), [v[0] for v in bounds.values()], [v[1] for v in bounds.values()])
 df = pd.DataFrame(samples, columns=bounds.keys())
